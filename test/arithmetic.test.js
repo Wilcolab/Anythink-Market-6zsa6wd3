@@ -93,7 +93,71 @@ describe('Arithmetic', function () {
         });
     });
 
-// TODO: Challenge #1
+describe('Power (additional)', function () {
+    it('one to a large power remains one', function (done) {
+        request.get('/arithmetic?operation=power&operand1=1&operand2=1000000')
+            .expect(200)
+            .end(function (err, res) {
+                expect(res.body).to.eql({ result: 1 });
+                done();
+            });
+    });
+
+    it('negative base with fractional exponent yields null (NaN)', function (done) {
+        request.get('/arithmetic?operation=power&operand1=-2&operand2=0.5')
+            .expect(200)
+            .end(function (err, res) {
+                expect(res.body).to.eql({ result: null });
+                done();
+            });
+    });
+
+    it('very large exponent that overflows yields null (Infinity)', function (done) {
+        request.get('/arithmetic?operation=power&operand1=2&operand2=1024')
+            .expect(200)
+            .end(function (err, res) {
+                expect(res.body).to.eql({ result: null });
+                done();
+            });
+    });
+
+    it('very small negative exponent underflows to zero', function (done) {
+        request.get('/arithmetic?operation=power&operand1=10&operand2=-324')
+            .expect(200)
+            .end(function (err, res) {
+                expect(res.body).to.eql({ result: 0 });
+                done();
+            });
+    });
+
+    it('fractional negative exponent (reciprocal root)', function (done) {
+        request.get('/arithmetic?operation=power&operand1=4&operand2=-0.5')
+            .expect(200)
+            .end(function (err, res) {
+                expect(res.body).to.eql({ result: 0.5 });
+                done();
+            });
+    });
+
+    it('handles exponential notation for exponent', function (done) {
+        request.get('/arithmetic?operation=power&operand1=2&operand2=-2e1')
+            .expect(200)
+            .end(function (err, res) {
+                // 2^(-20) = 1 / 1048576
+                expect(res.body).to.eql({ result: 9.5367431640625e-7 });
+                done();
+            });
+    });
+
+    it('handles irrational result for sqrt(2)', function (done) {
+        request.get('/arithmetic?operation=power&operand1=2&operand2=0.5')
+            .expect(200)
+            .end(function (err, res) {
+                expect(res.body).to.eql({ result: 1.4142135623730951 });
+                done();
+            });
+    });
+});
  
 
     describe('Multiplication', function () {
